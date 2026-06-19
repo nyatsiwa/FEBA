@@ -557,14 +557,10 @@ async function doRegister() {
 
   if (error) { showErr(errEl, error.message); return; }
 
-  // Update profile
-  if (data.user) {
-    await sb.from('profiles').upsert({
-      id: data.user.id, age: parseInt(age),
-      gender: genderMap[iAm], looking_for: lookingMap[iAm],
-      province, city,
-    });
-  }
+  // Note: profile + wallet are created automatically by the
+  // handle_new_user() database trigger — no frontend upsert needed.
+  // (Attempting one here would fail with 401 if email confirmation
+  // is required, since there's no active session yet.)
 
   errEl.classList.remove('on');
   goStep(4);
@@ -616,8 +612,21 @@ async function doLogout() {
 async function onSignedIn(user) {
   currentUser = user;
   // Fetch profile + wallet
-  const { data: profile } = await sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
+  let { data: profile } = await sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
   const { data: wallet  } = await sb.from('coin_wallets').select('balance').eq('user_id',user.id).maybeSingle();
+
+  // First real login after email confirmation: sync signup details
+  // (age/gender/province/city) from auth metadata into the profile row.
+  // Safe now because we have a real, authenticated session (RLS allows it).
+  const meta = user.user_metadata || {};
+  if (profile && meta.age && !profile.age) {
+    const { data: updated } = await sb.from('profiles').update({
+      age: meta.age, gender: meta.gender, looking_for: meta.looking_for,
+      province: meta.province, city: meta.city,
+    }).eq('id', user.id).select().maybeSingle();
+    if (updated) profile = updated;
+  }
+
   // Update header
   document.getElementById('loginShowBtn').style.display = 'none';
   document.getElementById('userPill').style.display     = 'flex';
