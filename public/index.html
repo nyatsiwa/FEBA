@@ -285,6 +285,15 @@ footer{border-top:1px solid var(--border);padding:22px 26px;text-align:center;co
       </div>
     </div>
 
+    <!-- WELCOME BACK CARD (shown when logged in) -->
+    <div class="card" id="welcomeCard" style="display:none;text-align:center">
+      <div style="font-size:2.4rem;margin-bottom:10px" id="welcomeEmoji">😊</div>
+      <div class="card-title" id="welcomeTitle">Welcome back!</div>
+      <div class="card-sub" style="margin-bottom:24px">Your matches are waiting in Nyobana 💕</div>
+      <button class="btn-rose" onclick="window.location.href='nyobana.html'">✨ Go to Nyobana</button>
+      <button class="btn-rose" style="background:transparent;border:1.5px solid var(--border);color:rgba(255,255,255,.7);margin-top:10px" onclick="goScr('plans')">View Plans</button>
+    </div>
+
     <!-- SIGNUP CARD -->
     <div class="card" id="signupCard">
       <div class="card-title">Sign up for free!</div>
@@ -633,6 +642,12 @@ async function onSignedIn(user) {
   document.getElementById('logoutBtn').style.display    = 'block';
   document.getElementById('userName').textContent       = profile?.first_name || user.email.split('@')[0];
   document.getElementById('userCoins').textContent      = `🪙 ${wallet?.balance || 0}`;
+
+  // Swap signup card for welcome-back card
+  document.getElementById('signupCard').style.display  = 'none';
+  document.getElementById('welcomeCard').style.display = 'block';
+  document.getElementById('welcomeTitle').textContent  = `Welcome back, ${profile?.first_name || user.email.split('@')[0]}!`;
+
   // Subscribe to coin balance changes (Realtime)
   sb.channel('wallet-' + user.id)
     .on('postgres_changes', { event:'UPDATE', schema:'public', table:'coin_wallets', filter:`user_id=eq.${user.id}` },
@@ -644,6 +659,8 @@ function onSignedOut() {
   document.getElementById('loginShowBtn').style.display = 'block';
   document.getElementById('userPill').style.display     = 'none';
   document.getElementById('logoutBtn').style.display    = 'none';
+  document.getElementById('welcomeCard').style.display  = 'none';
+  document.getElementById('signupCard').style.display   = 'block';
 }
 
 // ── PLANS ─────────────────────────────────
