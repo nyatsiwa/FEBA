@@ -403,6 +403,19 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
       <div class="profile-av-big" id="profAvBig">😊</div>
       <div class="profile-name" id="profName">Your Name</div>
       <div class="profile-email" id="profEmail">you@email.com</div>
+
+      <!-- VERIFICATION BANNER (women only) -->
+      <div id="verifyBanner" style="display:none;background:var(--gold-bg);border:1.5px solid rgba(245,197,24,.35);border-radius:var(--r);padding:14px 16px;margin-bottom:18px;text-align:left">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:1.3rem" id="verifyIcon">🔒</span>
+          <span style="font-weight:700;color:var(--dark);font-size:.9rem" id="verifyTitle">Verification Required for Payouts</span>
+        </div>
+        <div style="font-size:.79rem;color:var(--mid);line-height:1.5;margin-bottom:10px" id="verifyDesc">
+          Verify your identity with a photo to unlock coin withdrawals. Unverified accounts can earn coins but cannot cash out.
+        </div>
+        <button class="hof-b vc" style="width:100%;justify-content:center;padding:10px" id="verifyBtn" onclick="startVerification()">📸 Verify My Account</button>
+      </div>
+
       <div class="profile-stat-row">
         <div class="ps-stat"><div class="ps-num" id="ps-coins">0</div><div class="ps-lbl">Coins</div></div>
         <div class="ps-stat"><div class="ps-num" id="ps-matches">0</div><div class="ps-lbl">Matches</div></div>
@@ -410,13 +423,16 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
       </div>
       <div class="profile-menu">
         <div class="pm-row" onclick="openTopup()"><span class="pm-ico">🪙</span><span class="pm-label">Buy Coins</span><span class="pm-arrow">›</span></div>
-        <div class="pm-row" onclick="showToast('Earnings feature coming soon')"><span class="pm-ico">💰</span><span class="pm-label">My Earnings</span><span class="pm-arrow">›</span></div>
+        <div class="pm-row" onclick="goEarnings()"><span class="pm-ico">💰</span><span class="pm-label">My Earnings</span><span class="pm-arrow">›</span></div>
         <div class="pm-row" onclick="showToast('Edit profile coming soon')"><span class="pm-ico">✏️</span><span class="pm-label">Edit Profile</span><span class="pm-arrow">›</span></div>
         <div class="pm-row" onclick="window.location.href='index.html'"><span class="pm-ico">🏠</span><span class="pm-label">Back to FEBA</span><span class="pm-arrow">›</span></div>
       </div>
       <button class="btn-logout" onclick="doLogout()">Log Out</button>
     </div>
   </div>
+
+  <!-- HIDDEN FILE INPUT for verification photo -->
+  <input type="file" id="verifyFileInput" accept="image/*" capture="user" style="display:none" onchange="onVerifyPhotoSelected(event)"/>
 
   <!-- TAB BAR -->
   <nav class="tabbar">
@@ -588,20 +604,20 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 /* ── DATA ── */
 const MEMBERS = [
-  {rank:1,e:'👸',name:'Amahle K.',  loc:'Johannesburg',coins:'12,840🪙',on:true },
-  {rank:2,e:'😍',name:'Lerato M.',  loc:'Cape Town',    coins:'11,200🪙',on:true },
-  {rank:3,e:'🌟',name:'Zintle N.',  loc:'Durban',       coins:'10,650🪙',on:false},
-  {rank:4,e:'💃',name:'Precious T.',loc:'Pretoria',     coins:'9,980🪙', on:true },
-  {rank:5,e:'🌺',name:'Nomsa D.',   loc:'Port Elizabeth',coins:'9,310🪙',on:false},
-  {rank:6,e:'😎',name:'Sipho B.',   loc:'Sandton',      coins:'8,700🪙', on:true },
-  {rank:7,e:'🦋',name:'Thandi R.',  loc:'Bloemfontein', coins:'8,100🪙', on:true },
-  {rank:8,e:'🔥',name:'Lebo S.',    loc:'East London',  coins:'7,880🪙', on:false},
+  {rank:1,e:'👸',name:'Amahle K.',  loc:'Johannesburg',coins:'12,840🪙',on:true ,gender:'woman',verified:true },
+  {rank:2,e:'😍',name:'Lerato M.',  loc:'Cape Town',    coins:'11,200🪙',on:true ,gender:'woman',verified:true },
+  {rank:3,e:'🌟',name:'Zintle N.',  loc:'Durban',       coins:'10,650🪙',on:false,gender:'woman',verified:false},
+  {rank:4,e:'💃',name:'Precious T.',loc:'Pretoria',     coins:'9,980🪙', on:true ,gender:'woman',verified:true },
+  {rank:5,e:'🌺',name:'Nomsa D.',   loc:'Port Elizabeth',coins:'9,310🪙',on:false,gender:'woman',verified:false},
+  {rank:6,e:'😎',name:'Sipho B.',   loc:'Sandton',      coins:'8,700🪙', on:true ,gender:'man',  verified:true },
+  {rank:7,e:'🦋',name:'Thandi R.',  loc:'Bloemfontein', coins:'8,100🪙', on:true ,gender:'woman',verified:true },
+  {rank:8,e:'🔥',name:'Lebo S.',    loc:'East London',  coins:'7,880🪙', on:false,gender:'man',  verified:false},
 ];
 const RISING = [
-  {rank:1,e:'⭐',name:'Mpho L.',   loc:'Soweto',     coins:'4,200🪙',on:true },
-  {rank:2,e:'🌸',name:'Ayanda P.', loc:'Umhlanga',   coins:'3,900🪙',on:true },
-  {rank:3,e:'💫',name:'Tebogo M.', loc:'Nelspruit',  coins:'3,400🪙',on:false},
-  {rank:4,e:'🦅',name:'Bongani N.',loc:'Polokwane',  coins:'3,100🪙',on:true },
+  {rank:1,e:'⭐',name:'Mpho L.',   loc:'Soweto',     coins:'4,200🪙',on:true ,gender:'woman',verified:false},
+  {rank:2,e:'🌸',name:'Ayanda P.', loc:'Umhlanga',   coins:'3,900🪙',on:true ,gender:'woman',verified:true },
+  {rank:3,e:'💫',name:'Tebogo M.', loc:'Nelspruit',  coins:'3,400🪙',on:false,gender:'man',  verified:false},
+  {rank:4,e:'🦅',name:'Bongani N.',loc:'Polokwane',  coins:'3,100🪙',on:true ,gender:'man',  verified:true },
 ];
 const GIFTS_DATA = [
   {e:'❤️',name:'Heart',  cost:10 },
@@ -624,9 +640,11 @@ const COIN_PACKS = [
 const CHAT_REPLIES = ['Heyyy 😊','You seem really nice 😏','I\'m from Joburg, you?','Lol 😄 you\'re funny!','What do you do?','This is vibes 🔥','Tell me more 👀','Omg yes! 🙌'];
 
 /* ── STATE ── */
-let userCoins    = 10;
-let currentUser  = null;
-let activeChat   = null;
+let userCoins      = 10;
+let currentUser    = null;
+let currentGender  = null;   // 'man' | 'woman' | null (unknown = show everyone)
+let lookingForGender = null; // who this user wants to see (opposite gender)
+let activeChat     = null;
 let callTimer, callSecs = 0;
 let selectedGiftIdx  = 0;
 let selectedGiftCtx  = 'text';
@@ -634,6 +652,13 @@ let selectedPackIdx  = 1;
 let vcMuted = false, vcCamOff = false;
 let matchType = 'video';
 let callDemoFired = false;
+
+// Returns only members matching the opposite gender of the current user.
+// If we don't know the user's gender yet, show everyone (fail open for browsing).
+function genderFilter(list) {
+  if (!lookingForGender) return list;
+  return list.filter(m => m.gender === lookingForGender);
+}
 
 /* ── BOOT ── */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -654,8 +679,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 /* ── RENDER ── */
 function renderAll() {
   renderMsgList();
-  renderHofList(MEMBERS, 'hofList');
-  renderHofList(RISING,  'risingList');
+  renderHofList(genderFilter(MEMBERS), 'hofList');
+  renderHofList(genderFilter(RISING),  'risingList');
   renderAvatarStack();
   renderPacksGrid('packsGrid', false);
   renderPacksGrid('tupPacksGrid', true);
@@ -665,7 +690,7 @@ function renderAll() {
 function renderAvatarStack() {
   const stack = document.getElementById('avatarStack');
   if (!stack) return;
-  const pool = MEMBERS.slice(0, 5);
+  const pool = genderFilter(MEMBERS).slice(0, 5);
   stack.innerHTML = pool.map((m, i) => {
     const centerIdx = Math.floor(pool.length / 2);
     const cls = i === centerIdx ? 'as-av center' : 'as-av';
@@ -674,7 +699,7 @@ function renderAvatarStack() {
 }
 
 function renderMsgList() {
-  const online = MEMBERS.filter(m => m.on);
+  const online = genderFilter(MEMBERS.filter(m => m.on));
   const el = document.getElementById('msgList');
   if (!el) return;
   el.innerHTML = online.map(m => `
@@ -682,7 +707,7 @@ function renderMsgList() {
       <div class="mr-av">${m.e}${m.on?'<div class="online-ring"></div>':''}</div>
       <div class="mr-info">
         <div class="mr-top">
-          <div class="mr-name">${m.name}</div>
+          <div class="mr-name">${m.name}${m.gender==='woman'&&m.verified?' <span title="Verified" style="color:var(--green);font-size:.75rem">✅</span>':''}</div>
           <div class="mr-time">${m.on?'now':'Yesterday'}</div>
         </div>
         <div class="mr-preview ${m.on?'unread':''}">Tap to start chatting 👋</div>
@@ -704,7 +729,7 @@ function renderHofList(data, id) {
         ${m.on?'<div class="online-ring"></div>':''}
       </div>
       <div class="hof-info">
-        <div class="hof-name">${m.name}${m.on?'<span class="odot"></span>':''}</div>
+        <div class="hof-name">${m.name}${m.gender==='woman'&&m.verified?' <span title="Verified" style="color:var(--green);font-size:.75rem">✅</span>':''}${m.on?'<span class="odot"></span>':''}</div>
         <div class="hof-loc">📍 ${m.loc}</div>
         <div class="hof-score">🪙 ${m.coins}</div>
       </div>
@@ -833,7 +858,12 @@ function startMatch(type) {
   if (userCoins < (type==='video'?10:2)) { openTopup(); return; }
   matchType = type;
   document.getElementById('matchOv').classList.add('on');
-  const online = MEMBERS.filter(m=>m.on);
+  const online = genderFilter(MEMBERS.filter(m=>m.on));
+  if (!online.length) {
+    document.getElementById('matchOv').classList.remove('on');
+    showToast('No matches online right now — check back soon!');
+    return;
+  }
   setTimeout(() => {
     document.getElementById('matchOv').classList.remove('on');
     const m = online[Math.floor(Math.random()*online.length)];
@@ -986,6 +1016,15 @@ async function onLogin(user) {
   currentUser = user;
   const { data:wallet } = await sb.from('coin_wallets').select('balance').eq('user_id',user.id).maybeSingle();
   if (wallet) { userCoins = wallet.balance; updateCoinUI(); }
+
+  // Fetch gender + verification status from profile
+  const { data: profile } = await sb.from('profiles').select('gender, looking_for, verification_status').eq('id', user.id).maybeSingle();
+  currentGender = profile?.gender || user.user_metadata?.gender || null;
+  // Match by opposite gender of the logged-in user (man sees women, woman sees men)
+  lookingForGender = currentGender === 'man' ? 'woman' : currentGender === 'woman' ? 'man' : null;
+  renderAll(); // re-render lists now that we know who to filter for
+  updateVerifyBanner(profile?.verification_status || 'unverified');
+
   document.getElementById('profName').textContent  = user.user_metadata?.first_name || user.email.split('@')[0];
   document.getElementById('profEmail').textContent = user.email;
   document.getElementById('tupEmail').value        = user.email;
@@ -995,7 +1034,92 @@ async function onLogin(user) {
     p => { userCoins=p.new.balance; updateCoinUI(); }
   ).subscribe();
 }
-function onLogout() { currentUser=null; }
+function onLogout() { currentUser=null; currentGender=null; lookingForGender=null; renderAll(); }
+
+/* ── VERIFICATION (women-only payout gate) ── */
+function updateVerifyBanner(status) {
+  const banner = document.getElementById('verifyBanner');
+  if (!banner) return;
+
+  // Verification banner only applies to women (payout gating is gender-specific)
+  if (currentGender !== 'woman') { banner.style.display = 'none'; return; }
+
+  banner.style.display = 'block';
+  const icon = document.getElementById('verifyIcon');
+  const title = document.getElementById('verifyTitle');
+  const desc = document.getElementById('verifyDesc');
+  const btn = document.getElementById('verifyBtn');
+
+  if (status === 'verified') {
+    icon.textContent = '✅';
+    title.textContent = 'Verified — Payouts Unlocked';
+    desc.textContent = 'Your account is verified. You can withdraw earned coins as real money anytime from My Earnings.';
+    btn.style.display = 'none';
+  } else if (status === 'pending') {
+    icon.textContent = '⏳';
+    title.textContent = 'Verification Under Review';
+    desc.textContent = 'Your photo has been submitted and is being reviewed. This usually takes 24–48 hours.';
+    btn.style.display = 'none';
+  } else if (status === 'rejected') {
+    icon.textContent = '⚠️';
+    title.textContent = 'Verification Rejected';
+    desc.textContent = 'Your last submission was not approved. Please submit a clearer photo to try again.';
+    btn.textContent = '📸 Resubmit Verification';
+    btn.style.display = 'block';
+  } else {
+    icon.textContent = '🔒';
+    title.textContent = 'Verification Required for Payouts';
+    desc.textContent = 'Verify your identity with a photo to unlock coin withdrawals. Unverified accounts can earn coins but cannot cash out.';
+    btn.textContent = '📸 Verify My Account';
+    btn.style.display = 'block';
+  }
+}
+
+function startVerification() {
+  document.getElementById('verifyFileInput').click();
+}
+
+async function onVerifyPhotoSelected(event) {
+  const file = event.target.files[0];
+  if (!file || !currentUser) return;
+
+  showToast('📤 Uploading verification photo…');
+
+  try {
+    // Upload to Supabase Storage (bucket: "verification" must exist — see setup notes)
+    const filePath = `${currentUser.id}/${Date.now()}_${file.name}`;
+    const { error: uploadErr } = await sb.storage.from('verification').upload(filePath, file);
+    if (uploadErr) { showToast('⚠️ Upload failed: ' + uploadErr.message); return; }
+
+    const { data: urlData } = sb.storage.from('verification').getPublicUrl(filePath);
+
+    // Submit via the database function (sets status to 'pending')
+    const { error: submitErr } = await sb.rpc('submit_verification', { p_photo_url: urlData.publicUrl });
+    if (submitErr) { showToast('⚠️ Submission failed: ' + submitErr.message); return; }
+
+    showToast('✅ Verification submitted! We\'ll review it within 24–48 hours.');
+    updateVerifyBanner('pending');
+  } catch (err) {
+    showToast('⚠️ Something went wrong. Please try again.');
+    console.error(err);
+  }
+}
+
+function goEarnings() {
+  if (currentGender === 'woman' && document.getElementById('verifyBanner').style.display !== 'none') {
+    // Check current status before allowing withdrawal flow
+    sb.from('profiles').select('verification_status').eq('id', currentUser?.id).maybeSingle()
+      .then(({ data }) => {
+        if (data?.verification_status !== 'verified') {
+          showToast('🔒 Verify your account first to access payouts.');
+          return;
+        }
+        showToast('Earnings feature coming soon');
+      });
+  } else {
+    showToast('Earnings feature coming soon');
+  }
+}
 async function doLogout() {
   await sb.auth.signOut();
   window.location.href = 'index.html';
