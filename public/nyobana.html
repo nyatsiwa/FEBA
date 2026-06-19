@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover"/>
-<title>Nyobana — FEBA</title>
+<title>Mzansi — FEBA</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://js.paystack.co/v1/inline.js"></script>
@@ -329,7 +329,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
   <div class="screen on" id="s-inbox">
     <div class="inbox-header">
       <div class="ih-title">Messages</div>
-      <div class="ih-sub">Nyobana Hall of Fame</div>
+      <div class="ih-sub">Mzansi Hall of Fame</div>
     </div>
     <!-- System rows -->
     <div class="sys-row" onclick="showToast('Customer Service')">
@@ -343,7 +343,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
     </div>
     <div class="sys-row" onclick="showToast('No new notifications')">
       <div class="sys-av notif">🔔</div>
-      <div class="sys-info"><div class="sys-name">Notifications</div><div class="sys-preview" id="notifPreview">Welcome to Nyobana!</div></div>
+      <div class="sys-info"><div class="sys-name">Notifications</div><div class="sys-preview" id="notifPreview">Welcome to Mzansi!</div></div>
       <div class="sys-time">now</div>
     </div>
     <div class="section-divider">Recent Chats</div>
@@ -459,7 +459,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
     <div class="topbar-left">
       <button class="tb-back" id="backBtn" style="display:none" onclick="closeChat()">‹</button>
       <div>
-        <div class="tb-title" id="topTitle">Nyobana</div>
+        <div class="tb-title" id="topTitle">Mzansi</div>
         <div class="tb-sub" id="topSub">Hall of Fame</div>
       </div>
     </div>
@@ -767,7 +767,7 @@ function renderGiftsGrid() {
 }
 
 /* ── TABS ── */
-const TAB_TITLES = {inbox:'Nyobana',match:'Instant Match',hof:'Hall of Fame',coins:'Buy Coins',profile:'My Profile'};
+const TAB_TITLES = {inbox:'Mzansi',match:'Instant Match',hof:'Hall of Fame',coins:'Buy Coins',profile:'My Profile'};
 const TAB_SUBS   = {inbox:'Hall of Fame',match:'Use coins to connect',hof:'Top SA members',coins:'Power up your account',profile:'Your account'};
 function goTab(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
@@ -788,7 +788,7 @@ function openChat(name, emoji, isOnline) {
   activeChat = { name, emoji, online: isOnline };
   document.getElementById('ctAv').textContent   = emoji;
   document.getElementById('ctName').textContent = name;
-  document.getElementById('ctStat').textContent = isOnline ? '● Online · Nyobana' : '○ Offline';
+  document.getElementById('ctStat').textContent = isOnline ? '● Online · Mzansi' : '○ Offline';
   document.getElementById('chatMsgs').innerHTML = `<div class="bubble sys">You matched with ${name}! Say hello 👋</div>`;
   document.getElementById('chatScreen').classList.add('on');
   document.getElementById('backBtn').style.display = 'flex';
