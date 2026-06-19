@@ -1,0 +1,9 @@
+{
+  "name": "feba-dating",
+  "version": "1.0.0",
+  "description": "FEBA — South Africa's #1 Dating Site",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.4",
+    "axios": "^1.6.2"
+  }
+}
