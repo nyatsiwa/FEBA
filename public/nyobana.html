@@ -656,7 +656,6 @@ function renderAll() {
   renderMsgList();
   renderHofList(MEMBERS, 'hofList');
   renderHofList(RISING,  'risingList');
-  renderOnlineNow();
   renderAvatarStack();
   renderPacksGrid('packsGrid', false);
   renderPacksGrid('tupPacksGrid', true);
@@ -676,7 +675,9 @@ function renderAvatarStack() {
 
 function renderMsgList() {
   const online = MEMBERS.filter(m => m.on);
-  document.getElementById('msgList').innerHTML = online.map(m => `
+  const el = document.getElementById('msgList');
+  if (!el) return;
+  el.innerHTML = online.map(m => `
     <div class="msg-row" onclick="openChat('${m.name}','${m.e}','${m.on}')">
       <div class="mr-av">${m.e}${m.on?'<div class="online-ring"></div>':''}</div>
       <div class="mr-info">
@@ -693,7 +694,9 @@ function renderMsgList() {
 
 function renderHofList(data, id) {
   const medals = ['🥇','🥈','🥉'];
-  document.getElementById(id).innerHTML = data.map(m => `
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = data.map(m => `
     <div class="hof-row">
       <div class="hof-av">
         ${m.e}
@@ -713,16 +716,12 @@ function renderHofList(data, id) {
   ).join('');
 }
 
-function renderOnlineNow() {
-  document.getElementById('onlineNowRow').innerHTML = MEMBERS.filter(m=>m.on).map(m=>`
-    <div class="on-chip" onclick="openChat('${m.name}','${m.e}',true)">
-      <div class="oc-av">${m.e}</div>
-      <div class="oc-name">${m.name.split(' ')[0]}</div>
-    </div>`).join('');
-}
+// renderOnlineNow removed — superseded by renderAvatarStack on the Match tab
 
 function renderPacksGrid(id, small) {
-  document.getElementById(id).innerHTML = COIN_PACKS.map((p,i) => `
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = COIN_PACKS.map((p,i) => `
     <div class="${small?'tp':'pack'} ${p.pop?(small?'on':'pop'):''}" onclick="${small?`selPack(this,${i})`:`selPackAndOpen(${i})`}">
       ${p.pop?`<div class="${small?'tp-tag':'pack-pop-tag'}">Best Value</div>`:''}
       <div class="${small?'tp-coins':'pack-coins'}">${p.coins.toLocaleString()}</div>
@@ -732,7 +731,9 @@ function renderPacksGrid(id, small) {
 }
 
 function renderGiftsGrid() {
-  document.getElementById('giftsGrid').innerHTML = GIFTS_DATA.map((g,i)=>`
+  const el = document.getElementById('giftsGrid');
+  if (!el) return;
+  el.innerHTML = GIFTS_DATA.map((g,i)=>`
     <div class="gift-item ${i===0?'sel':''}" onclick="selGift(this,${i})">
       <span class="gi-em">${g.e}</span>
       <div class="gi-nm">${g.name}</div>
